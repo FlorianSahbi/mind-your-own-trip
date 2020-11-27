@@ -266,7 +266,7 @@ export const FLORIAN_PP: string =
 export const DELPHINE_PP: string =
   "https://scontent-cdt1-1.xx.fbcdn.net/v/t1.0-9/123346148_4026631660686124_8765939619000282630_o.jpg?_nc_cat=105&ccb=2&_nc_sid=09cbfe&_nc_ohc=VA2vt3VDJO8AX8HRARh&_nc_ht=scontent-cdt1-1.xx&oh=dc497c3d215cd29fd0579a7acc7e6c6d&oe=5FE6099E";
 
-export const G_KEY: string = "AIzaSyCF9WNdh-Aes4h_jk1ay9DVROddILrVx3s";
+export const G_KEY: string = "AIzaSyBKiJklpTe2GKWKaWevMOMZQSQxmbnpQV0";
 
 interface PositionInterface {
   lat: number;
