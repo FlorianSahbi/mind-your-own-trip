@@ -1,12 +1,11 @@
 import React from "react";
-import {
-  createMuiTheme,
-  ThemeProvider,
-} from "@material-ui/core/styles";
+import { ApolloProvider } from "@apollo/client";
+import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Home from "./Home";
 import User from "./User";
 import Users from "./Users";
+import client from "./Client";
 
 export const theme = createMuiTheme({
   typography: {
@@ -39,20 +38,22 @@ export const theme = createMuiTheme({
 
 export default function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <Router>
-        <Switch>
-          <Route path="/users">
-            <Users />
-          </Route>
-          <Route path="/user/:id">
-            <User />
-          </Route>
-          <Route path="/">
-            <Home />
-          </Route>
-        </Switch>
-      </Router>
-    </ThemeProvider>
+    <ApolloProvider client={client}>
+      <ThemeProvider theme={theme}>
+        <Router>
+          <Switch>
+            <Route path="/users">
+              <Users />
+            </Route>
+            <Route path="/user/:id">
+              <User />
+            </Route>
+            <Route path="/">
+              <Home />
+            </Route>
+          </Switch>
+        </Router>
+      </ThemeProvider>
+    </ApolloProvider>
   );
 }
