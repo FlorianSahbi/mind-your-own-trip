@@ -5,6 +5,7 @@ import MenuRoundedIcon from '@material-ui/icons/MenuRounded';
 import RestaurantRoundedIcon from '@material-ui/icons/RestaurantRounded';
 import LandscapeRoundedIcon from '@material-ui/icons/LandscapeRounded';
 import CountrySelect from "./CountryFilter";
+import { useHistory } from "react-router-dom";
 
 const useStylesAppBar = makeStyles({
   root: {
@@ -15,18 +16,24 @@ const useStylesAppBar = makeStyles({
 
 function ButtonAppBar() {
   const classes = useStylesAppBar();
+  const history = useHistory();
   return (
     <AppBar position="relative" color="transparent">
       <Toolbar component="header" classes={{ root: classes.root }}>
         <Typography variant="h1">Mind Your Own Trip</Typography>
-        {/* <Button>
+        {/* 
+        <Button>
           <LandscapeRoundedIcon />
           <Typography>Places</Typography>
         </Button>
         <Button>
           <RestaurantRoundedIcon />
           <Typography>Restaurants</Typography>
-        </Button> */}
+        </Button> 
+      */}
+        <Button onClick={() => history.push("/users")}>
+          <Typography>Users</Typography>
+        </Button>
         <Avatar src={FLORIAN_PP} />
       </Toolbar>
     </AppBar>

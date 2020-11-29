@@ -1,5 +1,6 @@
 const { ApolloServer, gql } = require('apollo-server');
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 mongoose.connect('mongodb://localhost/myot', { useNewUrlParser: true });
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -7,20 +8,34 @@ db.once('open', function () {
   console.log("hello")
 });
 
+const pointSchema = new Schema({
+  type: {
+    type: String,
+    enum: ['Point'],
+    required: true
+  },
+  coordinates: {
+    type: [Number],
+    required: true
+  }
+});
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
   firstName: String,
   lastName: String,
   profilePicure: String
 });
 
-const placeSchema = new mongoose.Schema({
-  // user: UserInterface;
+const placeSchema = new Schema({
   name: String,
   country: String,
   preview: String,
   code: String,
-  // position: PositionInterface;
+  location: {
+    type: pointSchema,
+    required: true
+  },
+  addedBy: { type: Schema.Types.ObjectId, ref: "User" }
 });
 
 const User = mongoose.model('User', userSchema);
@@ -28,18 +43,26 @@ const Place = mongoose.model('Place', placeSchema);
 
 
 const typeDefs = gql`
+
+  type Point {
+    _id: ID!
+    type: String
+    coordinates: [Float]
+  }
   type User {
-    _id: ID
+    _id: ID!
     firstName: String
     lastName: String
     profilePicure: String
   }
   type Place {
-    _id: ID
+    _id: ID!
     name: String
     country: String
     preview: String
     code: String
+    location: Point
+    addedBy: User
   }
 
   type Query {
@@ -49,7 +72,7 @@ const typeDefs = gql`
     getPlace(id: ID!): Place
   }
   type Mutation {
-    createPlace(name: String, country: String, preview: String, code: String ): Place
+    createPlace(name: String, country: String, preview: String, code: String, addedBy: ID!, lng: Float, lat: Float): Place
     updatePlace(id: ID!, name: String): Place
     deletePlace(id: ID!): Place
     createUser(firstName: String, lastName: String, country: String, code: String): User
@@ -61,7 +84,9 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     getPlaces: async () => {
-      return await Place.find({});
+      const p = await Place.find({});
+      console.log(p)
+      return await Place.find({}).populate("addedBy");
     },
     getPlace: async (parent, args, context, info) => {
       const user = await Place.findById(args.id);
@@ -78,7 +103,9 @@ const resolvers = {
   },
   Mutation: {
     createPlace: async (parent, args, context, info) => {
-      const place = await new Place({ name: args.name, country: args.country, preview: args.preview, code: args.code });
+      console.log(args)
+      const place = await new Place({ name: args.name, country: args.country, preview: args.preview, code: args.code, addedBy: args.addedBy, location: { coordinates: [args.lng, args.lat], type: "Point" } });
+      console.log(place)
       place.save((err) => {
         if (err) {
           return console.error(err);

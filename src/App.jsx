@@ -2,6 +2,7 @@ import React from "react";
 import { ApolloProvider } from "@apollo/client";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { SnackbarProvider } from "notistack";
 import Home from "./Home";
 import User from "./User";
 import Users from "./Users";
@@ -40,19 +41,28 @@ export default function App() {
   return (
     <ApolloProvider client={client}>
       <ThemeProvider theme={theme}>
-        <Router>
-          <Switch>
-            <Route path="/users">
-              <Users />
-            </Route>
-            <Route path="/user/:id">
-              <User />
-            </Route>
-            <Route path="/">
-              <Home />
-            </Route>
-          </Switch>
-        </Router>
+        <SnackbarProvider
+          maxSnack={3}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          hideIconVariant
+        >
+          <Router>
+            <Switch>
+              <Route path="/users">
+                <Users />
+              </Route>
+              <Route path="/user/:id">
+                <User />
+              </Route>
+              <Route path="/">
+                <Home />
+              </Route>
+            </Switch>
+          </Router>
+        </SnackbarProvider>
       </ThemeProvider>
     </ApolloProvider>
   );
