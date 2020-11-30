@@ -31,7 +31,6 @@ function ButtonAppBar() {
   const { openModal } = DialogContext.useContainer();
 
   const handleClick = (event: MouseEvent<HTMLElement>) => {
-    console.log(event)
     setAnchorEl(event.currentTarget);
   };
 

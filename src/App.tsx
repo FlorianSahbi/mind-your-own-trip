@@ -5,7 +5,8 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { createContainer } from "unstated-next";
 import { SnackbarProvider, useSnackbar } from "notistack";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation, gql } from "@apollo/client";
+import { CREATE_PLACE } from "./GraphQl/places";
 import {
   Dialog,
   DialogActions,
@@ -31,31 +32,6 @@ interface DialogContextInterface {
   createPlaceModal: boolean;
 }
 
-const CREATE_PLACE = gql`
-  mutation CreatePlace(
-      $name: String
-      $country: String 
-      $preview: String 
-      $code: String 
-      $addedBy: ID! 
-      $lng: Float 
-      $lat: Float
-    ) {
-    createPlace(
-      name: $name 
-      country: $country 
-      preview: $preview 
-      code: $code 
-      addedBy: $addedBy 
-      lng: $lng 
-      lat: $lat
-      ) {
-      _id
-      name
-    }
-  }
-`;
-
 const initialState: DialogContextInterface = {
   createPlaceModal: false,
 }
@@ -67,6 +43,7 @@ function useDialog(initialState: DialogContextInterface) {
   return { ...state, openModal, closeModal };
 }
 
+//@ts-ignore
 export let DialogContext = createContainer(useDialog);
 
 export const theme = createMuiTheme({
@@ -103,14 +80,43 @@ function Dialogs() {
   const { register, handleSubmit } = useForm();
   const { enqueueSnackbar } = useSnackbar();
   const [createPlace] = useMutation(CREATE_PLACE, {
+    update: (cache, { data: { createPlace } }) => {
+      cache.modify({
+        fields: {
+          getPlaces(existingPlaces = []) {
+            const newPlaceRef = cache.writeFragment({
+              data: createPlace,
+              fragment: gql`
+                fragment NewPlace on Place {
+                  _id
+                  name
+                  country
+                  preview
+                  code
+                  addedBy {
+                    firstName
+                    profilePicure
+                  }
+                  location {
+                    coordinates
+                  }
+                }
+              `
+            });
+            console.log(newPlaceRef)
+            console.log(existingPlaces)
+            return [newPlaceRef, ...existingPlaces];
+          }
+        }
+      });
+    },
     onCompleted: ({ createPlace: { name } }: any) => {
       enqueueSnackbar(`${name} has been successfully added to our list`, { variant: "success" });
       closeModal("createPlaceModal");
     }
   })
   const onSubmit = (data: any) => {
-    console.log({ ...data, addedBy: FLORIAN_ID_DB, lng: 2.8954, lat: 42.6976 })
-    createPlace({ variables: { ...data, addedBy: FLORIAN_ID_DB, lng: 2.8954, lat: 42.6976 } })
+    createPlace({ variables: { ...data, lng: parseFloat(data.lng), lat: parseFloat(data.lat), addedBy: FLORIAN_ID_DB } })
   };
 
   return (
@@ -158,6 +164,24 @@ function Dialogs() {
               margin="dense"
               name="code"
               label="Code"
+              id="outlined-basic"
+              variant="outlined"
+              inputRef={register({ required: true })}
+            />
+            <span style={{ margin: "10px 0" }} />
+            <TextField
+              margin="dense"
+              name="lat"
+              label="Latitude"
+              id="outlined-basic"
+              variant="outlined"
+              inputRef={register({ required: true })}
+            />
+            <span style={{ margin: "10px 0" }} />
+            <TextField
+              margin="dense"
+              name="lng"
+              label="Longitude"
               id="outlined-basic"
               variant="outlined"
               inputRef={register({ required: true })}

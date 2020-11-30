@@ -5,7 +5,6 @@ mongoose.connect('mongodb://localhost/myot', { useNewUrlParser: true });
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
-  console.log("hello")
 });
 
 const pointSchema = new Schema({
@@ -85,7 +84,6 @@ const resolvers = {
   Query: {
     getPlaces: async () => {
       const p = await Place.find({});
-      console.log(p)
       return await Place.find({}).populate("addedBy");
     },
     getPlace: async (parent, args, context, info) => {
@@ -103,9 +101,7 @@ const resolvers = {
   },
   Mutation: {
     createPlace: async (parent, args, context, info) => {
-      console.log(args)
       const place = await new Place({ name: args.name, country: args.country, preview: args.preview, code: args.code, addedBy: args.addedBy, location: { coordinates: [args.lng, args.lat], type: "Point" } });
-      console.log(place)
       place.save((err) => {
         if (err) {
           return console.error(err);

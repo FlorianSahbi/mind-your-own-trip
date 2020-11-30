@@ -41,6 +41,7 @@ const UPDATE_USER = gql`
 `;
 
 function User() {
+  // @ts-ignore
   const { id } = useParams();
   const history = useHistory();
   const { enqueueSnackbar } = useSnackbar();
