@@ -74,8 +74,8 @@ const typeDefs = gql`
     createPlace(name: String, country: String, preview: String, code: String, addedBy: ID!, lng: Float, lat: Float): Place
     updatePlace(id: ID!, name: String): Place
     deletePlace(id: ID!): Place
-    createUser(firstName: String, lastName: String, lastName: String): User
-    updateUser(id: ID!, firstName: String, lastName: String, lastName: String): User
+    createUser(firstName: String, lastName: String, profilePicture: String): User
+    updateUser(id: ID!, firstName: String, lastName: String, profilePicture: String): User
     deleteUser(id: ID!): User
   }
 `;
