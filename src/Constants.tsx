@@ -258,6 +258,8 @@ export const countries: CountryType[] = [
   { code: 'ZW', label: 'Zimbabwe', phone: '263' },
 ];
 
+export const FLORIAN_ID_DB = "5fc2c0b1be242627fe187564";
+
 export const DEFAULT_PICTURE: string =
   "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/08ff2967557635.5b3dce5725b0d.jpg";
 export const FLORIAN_PP: string =

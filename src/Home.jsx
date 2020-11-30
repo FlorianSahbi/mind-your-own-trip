@@ -1,14 +1,13 @@
 import React, { useState } from "react";
+import { gql, useQuery } from "@apollo/client";
 import "./App.css";
-import {
-  createStyles,
-  Theme,
-} from "@material-ui/core/styles";
+import { createStyles, Theme } from "@material-ui/core/styles";
 import RoomRoundedIcon from "@material-ui/icons/RoomRounded";
 import { G_KEY, places, default_map_pos } from "./Constants";
 import GoogleMapReact from "google-map-react";
 import CardPlace from "./Card";
 import ButtonAppBar from "./Header";
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -24,11 +23,39 @@ const styles = (theme: Theme) =>
     },
   });
 
+const GET_PLACES = gql`
+  query GetPlaces {
+    getPlaces {
+      _id
+      name
+      country
+      preview
+      code
+      addedBy {
+        firstName
+        profilePicure
+      }
+      location {
+        coordinates
+      }
+    }
+  }
+`;
+
 function App() {
-  const [placesList] = useState(places);
-  console.log(placesList);
+  const { data, loading, error } = useQuery(GET_PLACES);
+
+  if (error) {
+    return <p>Error...</p>;
+  }
+
+  if (loading) {
+    return <CircularProgress />;
+  }
+
   return (
     <>
+      <div style={{ height: "64px" }} />
       <ButtonAppBar />
       <div style={{ height: "70vh", width: "100%" }}>
         <GoogleMapReact
@@ -37,7 +64,7 @@ function App() {
           defaultZoom={5}
           onClick={(value) => console.log(value)}
         >
-          {placesList?.map(({ name, position: { lat, lng } }) => (
+          {data.getPlaces?.map(({ name, location: {coordinates: [lng, lat]} }) => (
             <RoomRoundedIcon color="error" size="28px" lat={lat} lng={lng} />
           ))}
         </GoogleMapReact>
@@ -51,15 +78,16 @@ function App() {
           padding: "1rem",
         }}
       >
-        {placesList?.map(
-          ({ name, preview, code, country, user: { profilePicture } }) => (
+        {console.log(data)}
+        {data.getPlaces?.map(
+          ({ name, preview, code, country, addedBy: { profilePicure } }) => (
             <CardPlace
               key={`${name}${preview}`}
               name={name}
               src={preview}
               country={country}
               code={code}
-              profilePicture={profilePicture}
+              profilePicture={profilePicure}
             />
           )
         )}
