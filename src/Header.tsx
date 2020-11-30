@@ -1,4 +1,4 @@
-import { AppBar, Avatar, Button, IconButton, List, ListItem, ListItemAvatar, ListItemText, makeStyles, Menu, MenuItem, Toolbar, Typography } from "@material-ui/core";
+import { AppBar, Avatar, IconButton, List, ListItem, ListItemAvatar, ListItemText, makeStyles, Menu, MenuItem, Toolbar, Typography, useMediaQuery } from "@material-ui/core";
 import React, { useState, MouseEvent } from "react";
 import { FLORIAN_PP } from "./Constants";
 import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
@@ -13,13 +13,9 @@ const useStylesAppBar = makeStyles({
   root: {
     display: "flex",
     justifyContent: "space-between",
+    minHeight: "64px",
   },
 });
-
-const options = [
-  "Place",
-  "Restaurant",
-];
 
 const ITEM_HEIGHT = 48;
 
@@ -28,6 +24,7 @@ function ButtonAppBar() {
   const history = useHistory();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const mobile = useMediaQuery('(min-width:610px)');
   const { openModal } = DialogContext.useContainer();
 
   const handleClick = (event: MouseEvent<HTMLElement>) => {
@@ -40,22 +37,24 @@ function ButtonAppBar() {
 
   return (
     <>
-      <AppBar position="fixed" color="transparent" style={{ backgroundColor: "white" }} >
+      <AppBar position="fixed" color="transparent" style={{ backgroundColor: "white", minHeight: "64px" }} >
         <Toolbar component="header" classes={{ root: classes.root }}>
           <div style={{
             // border: "3px solid blue", 
             height: "100%",
-            width: "50%",
+            width: "fit-content",
             display: "flex",
           }}>
             <Avatar src={logo} />
             <span style={{ marginRight: "10px" }} />
-            <Typography variant="h1">Mind Your Own Trip</Typography>
+            {
+              mobile && <Typography variant="h1">Mind Your Own Trip</Typography>
+            }
           </div>
           <div style={{
             // border: "3px solid blue", 
             height: "100%",
-            width: "50%",
+            width: "fit-content",
             display: "flex",
             justifyContent: "flex-end"
           }}>

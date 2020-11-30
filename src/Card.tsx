@@ -1,4 +1,4 @@
-import { CardActionArea, Card, CardHeader, Avatar, IconButton, Typography, CardMedia, CardActions, Button, makeStyles, MenuItem, Menu } from "@material-ui/core";
+import { CardActionArea, Card, CardHeader, Avatar, Typography, CardMedia, CardActions, Button, makeStyles, } from "@material-ui/core";
 import React, { useState, MouseEvent } from "react";
 import countryToFlag from "./countryToFlag";
 import MoreVertRoundedIcon from '@material-ui/icons/MoreVertRounded';
@@ -25,30 +25,14 @@ const useStylesCards = makeStyles({
 
 
 function CardPlace({ name, src, code, country, profilePicture, onClick, }: CardInterface) {
+  console.log(profilePicture)
   const classes = useStylesCards();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-
-  const handleClick = (event: MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   return (
     <Card onClick={onClick} className={classes.root}>
       <CardActionArea>
         <CardHeader
-          avatar={
-            <Avatar
-              src={profilePicture}
-              aria-label="recipe"
-            >
-              R
-              </Avatar>
-          }
+          avatar={profilePicture ? <Avatar src={profilePicture} aria-label="recipe" /> : <Avatar src={profilePicture} aria-label="recipe"> U  </Avatar>}
           title={<Typography variant="h2">{name}</Typography>}
         />
         <CardMedia
@@ -66,7 +50,7 @@ function CardPlace({ name, src, code, country, profilePicture, onClick, }: CardI
           </Typography>
         </Button>
       </CardActions>
-    </Card>
+    </Card >
   );
 }
 
