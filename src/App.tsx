@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { createContainer } from "unstated-next";
 import { SnackbarProvider, useSnackbar } from "notistack";
-import { useMutation, gql } from "@apollo/client";
+import { useMutation, gql, useQuery } from "@apollo/client";
 import { CREATE_PLACE } from "./GraphQl/places";
 import {
   Dialog,
@@ -20,7 +20,7 @@ import Home from "./Home";
 import User from "./User";
 import Users from "./Users";
 import client from "./Client";
-import { FLORIAN_ID_DB } from "./Constants";
+import { GET_USERS } from "./GraphQl/users";
 
 interface FormInterface {
   firstName: string;
@@ -36,15 +36,33 @@ const initialState: DialogContextInterface = {
   createPlaceModal: false,
 }
 
+interface UserInterface {
+  firstName: string
+  lastName?: string
+  profilePicture: string
+  __typename: "User"
+  _id: string
+}
+
+function useAuth() {
+  const [activeUser, setActiveUser] = useState<UserInterface | null>(null);
+  return {
+    activeUser,
+    setActiveUser
+  }
+}
+
 function useDialog(initialState: DialogContextInterface) {
-  let [state, setState] = useState<DialogContextInterface>(initialState);
-  let openModal = (name: "createPlaceModal") => setState({ ...state, [name]: true });
-  let closeModal = (name: "createPlaceModal") => setState({ ...state, [name]: false });
+  const [state, setState] = useState<DialogContextInterface>(initialState);
+  const openModal = (name: "createPlaceModal") => setState({ ...state, [name]: true });
+  const closeModal = (name: "createPlaceModal") => setState({ ...state, [name]: false });
   return { ...state, openModal, closeModal };
 }
 
 //@ts-ignore
-export let DialogContext = createContainer(useDialog);
+export const DialogContext = createContainer(useDialog);
+//@ts-ignore
+export const AuthContext = createContainer(useAuth);
 
 export const theme = createMuiTheme({
   typography: {
@@ -77,6 +95,7 @@ export const theme = createMuiTheme({
 
 function Dialogs() {
   const { createPlaceModal, closeModal } = DialogContext.useContainer();
+  const { activeUser } = AuthContext.useContainer();
   const { register, handleSubmit } = useForm();
   const { enqueueSnackbar } = useSnackbar();
   const [createPlace] = useMutation(CREATE_PLACE, {
@@ -116,7 +135,8 @@ function Dialogs() {
     }
   })
   const onSubmit = (data: any) => {
-    createPlace({ variables: { ...data, lng: parseFloat(data.lng), lat: parseFloat(data.lat), addedBy: FLORIAN_ID_DB } })
+    //@ts-ignore
+    createPlace({ variables: { ...data, lng: parseFloat(data.lng), lat: parseFloat(data.lat), addedBy: activeUser?._id } })
   };
 
   return (
@@ -172,6 +192,7 @@ function Dialogs() {
             <TextField
               margin="dense"
               name="lat"
+              defaultValue="48.8534"
               label="Latitude"
               id="outlined-basic"
               variant="outlined"
@@ -181,6 +202,7 @@ function Dialogs() {
             <TextField
               margin="dense"
               name="lng"
+              defaultValue="2.3488"
               label="Longitude"
               id="outlined-basic"
               variant="outlined"
@@ -213,31 +235,33 @@ export default function App() {
   return (
     <ApolloProvider client={client}>
       <ThemeProvider theme={theme}>
-        <SnackbarProvider
-          maxSnack={3}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "right",
-          }}
-          hideIconVariant
-        >
-          <DialogContext.Provider initialState={initialState}>
-            <Router>
-              <Switch>
-                <Route path="/users">
-                  <Users />
-                </Route>
-                <Route path="/user/:id">
-                  <User />
-                </Route>
-                <Route path="/">
-                  <Home />
-                </Route>
-              </Switch>
-            </Router>
-            <Dialogs />
-          </DialogContext.Provider>
-        </SnackbarProvider>
+        <AuthContext.Provider>
+          <SnackbarProvider
+            maxSnack={3}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            hideIconVariant
+          >
+            <DialogContext.Provider initialState={initialState}>
+              <Router>
+                <Switch>
+                  <Route path="/users">
+                    <Users />
+                  </Route>
+                  <Route path="/user/:id">
+                    <User />
+                  </Route>
+                  <Route path="/">
+                    <Home />
+                  </Route>
+                </Switch>
+              </Router>
+              <Dialogs />
+            </DialogContext.Provider>
+          </SnackbarProvider>
+        </AuthContext.Provider>
       </ThemeProvider>
     </ApolloProvider>
   );

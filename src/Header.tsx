@@ -1,13 +1,17 @@
 import { AppBar, Avatar, IconButton, List, ListItem, ListItemAvatar, ListItemText, makeStyles, Menu, MenuItem, Toolbar, Typography, useMediaQuery } from "@material-ui/core";
 import React, { useState, MouseEvent } from "react";
-import { FLORIAN_PP } from "./Constants";
+import { useQuery } from "@apollo/client";
 import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
+import LoopRoundedIcon from '@material-ui/icons/LoopRounded';
 import PeopleRoundedIcon from '@material-ui/icons/PeopleRounded';
 import { useHistory } from "react-router-dom";
 import LandscapeRoundedIcon from '@material-ui/icons/LandscapeRounded';
 import RestaurantMenuRoundedIcon from '@material-ui/icons/RestaurantMenuRounded';
 import logo from "./logo.png";
-import { DialogContext } from "./App";
+import { DialogContext, AuthContext } from "./App";
+import { GET_USERS } from "./GraphQl/users";
+import { useSnackbar } from "notistack";
+
 
 const useStylesAppBar = makeStyles({
   root: {
@@ -20,6 +24,7 @@ const useStylesAppBar = makeStyles({
 const ITEM_HEIGHT = 48;
 
 function ButtonAppBar() {
+  const { activeUser } = AuthContext.useContainer();
   const classes = useStylesAppBar();
   const history = useHistory();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -34,6 +39,44 @@ function ButtonAppBar() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  function SelectUser(): React.ReactElement {
+    const { enqueueSnackbar } = useSnackbar();
+    const { setActiveUser, activeUser } = AuthContext.useContainer();
+    const { data, loading, error } = useQuery(GET_USERS);
+
+    if (error) {
+      return <p>Error...</p>
+    }
+
+    if (loading) {
+      return <p>Loading...</p>;
+    }
+
+    if (activeUser) {
+      return (
+        <>
+          <IconButton style={{ height: "40px", width: "40px" }} onClick={() => history.push(`user/${activeUser?._id}`)} aria-label="users">
+            <Avatar src={activeUser?.profilePicture} style={{ height: "30px", width: "30px" }} />
+          </IconButton>
+          <IconButton style={{ height: "40px", width: "40px" }} onClick={() => { setActiveUser(activeUser?._id === data.getUsers[0]._id ? data.getUsers[1] : data.getUsers[0]); enqueueSnackbar(`Bye ${activeUser?.firstName} !`) }} aria-label="users">
+            <LoopRoundedIcon style={{ height: "30px", width: "30px" }} />
+          </IconButton>
+        </>
+      )
+    }
+
+    return (
+      <>
+        <IconButton style={{ height: "40px", width: "40px" }} disabled>
+          <Avatar style={{ height: "30px", width: "30px" }} />
+        </IconButton>
+        <IconButton style={{ height: "40px", width: "40px" }} onClick={() => { setActiveUser(data.getUsers[1]); enqueueSnackbar(`Hi ${data.getUsers[1]?.firstName} !`) }} aria-label="users">
+          <LoopRoundedIcon style={{ height: "30px", width: "30px" }} />
+        </IconButton>
+      </>
+    )
+  }
 
   return (
     <>
@@ -64,6 +107,7 @@ function ButtonAppBar() {
               aria-controls="long-menu"
               aria-haspopup="true"
               onClick={handleClick}
+              disabled={!activeUser}
             >
               <AddCircleRoundedIcon style={{ height: "30px", width: "30px" }} />
             </IconButton>
@@ -107,10 +151,7 @@ function ButtonAppBar() {
             <IconButton style={{ height: "40px", width: "40px" }} onClick={() => history.push("/users")} aria-label="users">
               <PeopleRoundedIcon style={{ height: "30px", width: "30px" }} />
             </IconButton>
-
-            <IconButton style={{ height: "40px", width: "40px" }} onClick={() => history.push("/user/5fc2c0b1be242627fe187564")} aria-label="users">
-              <Avatar src={FLORIAN_PP} style={{ height: "30px", width: "30px" }} />
-            </IconButton>
+            <SelectUser />
           </div>
         </Toolbar>
       </AppBar >
