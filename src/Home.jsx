@@ -67,7 +67,7 @@ function Home() {
             preview,
             code,
             country,
-            addedBy: { profilePicure },
+            addedBy: { profilePicture },
             location: {
               coordinates: [lng, lat],
             },
@@ -79,7 +79,7 @@ function Home() {
               src={preview}
               country={country}
               code={code}
-              profilePicture={profilePicure}
+              profilePicture={profilePicture}
             />
           )
         )}

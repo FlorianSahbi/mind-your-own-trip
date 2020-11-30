@@ -13,7 +13,7 @@ const GET_USER = gql`
       _id
       firstName
       lastName
-      profilePicure
+      profilePicture
     }
   }
 `;
@@ -24,7 +24,7 @@ const DELETE_USER = gql`
       _id
       firstName
       lastName
-      profilePicure
+      profilePicture
     }
   }
 `;
@@ -35,7 +35,7 @@ const UPDATE_USER = gql`
       _id
       firstName
       lastName
-      profilePicure
+      profilePicture
     }
   }
 `;
@@ -58,7 +58,7 @@ function User() {
   })
 
   const [UpdateUser] = useMutation(UPDATE_USER, {
-    onCompleted: ({ updateUser: { firstName, lastName, profilePicure } }) => {
+    onCompleted: ({ updateUser: { firstName, lastName, profilePicture } }) => {
       enqueueSnackbar(`${firstName} has been successfully updated`, { variant: "success" });
     }
   })
@@ -94,7 +94,7 @@ function User() {
         alignItems: "center",
         flexDirection: "column",
       }}>
-        <Avatar style={{ height: "100px", width: "100px" }} alt="Cindy Baker" src={data.getUser.profilePicure} />
+        <Avatar style={{ height: "100px", width: "100px" }} alt="Cindy Baker" src={data.getUser.profilePicture} />
         <Typography variant="h1">
           {data.getUser.firstName}
         </Typography>

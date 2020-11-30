@@ -10,7 +10,7 @@ const GET_USERS = gql`
       _id
       firstName
       lastName
-      profilePicure
+      profilePicture
     }
   }
 `;
@@ -46,7 +46,7 @@ function User() {
       alignItems: "center",
     }}>
 
-      {data.getUsers.map(({ firstName, profilePicure, _id }: any) => {
+      {data.getUsers.map(({ firstName, profilePicture, _id }: any) => {
         return (
           <>
             <div
@@ -60,7 +60,7 @@ function User() {
                 flexDirection: "column",
                 cursor: "pointer"
               }}>
-              <Avatar style={{ height: "calc(8*20px)", width: "calc(8*20px)" }} alt={`${firstName}'s profile picture`} src={profilePicure} />
+              <Avatar style={{ height: "calc(8*20px)", width: "calc(8*20px)" }} alt={`${firstName}'s profile picture`} src={profilePicture} />
               <Typography variant="h1">
                 {firstName}
               </Typography>

@@ -22,7 +22,7 @@ const pointSchema = new Schema({
 const userSchema = new Schema({
   firstName: String,
   lastName: String,
-  profilePicure: String
+  profilePicture: String
 });
 
 const placeSchema = new Schema({
@@ -52,7 +52,7 @@ const typeDefs = gql`
     _id: ID!
     firstName: String
     lastName: String
-    profilePicure: String
+    profilePicture: String
   }
   type Place {
     _id: ID!
@@ -74,8 +74,8 @@ const typeDefs = gql`
     createPlace(name: String, country: String, preview: String, code: String, addedBy: ID!, lng: Float, lat: Float): Place
     updatePlace(id: ID!, name: String): Place
     deletePlace(id: ID!): Place
-    createUser(firstName: String, lastName: String, country: String, code: String): User
-    updateUser(id: ID!, firstName: String): User
+    createUser(firstName: String, lastName: String, lastName: String): User
+    updateUser(id: ID!, firstName: String, lastName: String, lastName: String): User
     deleteUser(id: ID!): User
   }
 `;
@@ -118,7 +118,7 @@ const resolvers = {
       return place;
     },
     createUser: async (parent, args, context, info) => {
-      const user = await new User({ firstName: args.firstName, lastName: args.lastname, profilePicure: args.profilePicure });
+      const user = await new User({ firstName: args.firstName, lastName: args.lastname, profilePicture: args.profilePicture });
       user.save((err) => {
         if (err) {
           return console.error(err);

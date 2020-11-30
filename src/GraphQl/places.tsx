@@ -10,7 +10,7 @@ export const GET_PLACES = gql`
       code
       addedBy {
         firstName
-        profilePicure
+        profilePicture
       }
       location {
         coordinates
@@ -45,7 +45,7 @@ export const CREATE_PLACE = gql`
       code
       addedBy {
         firstName
-        profilePicure
+        profilePicture
       }
       location {
         coordinates

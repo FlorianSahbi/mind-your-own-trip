@@ -95,7 +95,7 @@ function Dialogs() {
                   code
                   addedBy {
                     firstName
-                    profilePicure
+                    profilePicture
                   }
                   location {
                     coordinates
