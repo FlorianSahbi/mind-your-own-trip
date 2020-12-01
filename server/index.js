@@ -84,7 +84,7 @@ const typeDefs = gql`
   }
   type Mutation {
     createPlace(name: String, country: String, preview: String, code: String, addedBy: ID!, lng: Float, lat: Float): Place
-    updatePlace(id: ID!, name: String, code: String, country: String, preview: String): Place
+    updatePlace(id: ID!, name: String, code: String, country: String, preview: String, lng: Float, lat: Float): Place
     deletePlace(id: ID!): Place
     createUser(firstName: String, lastName: String, profilePicture: String): User
     updateUser(id: ID!, firstName: String, lastName: String, profilePicture: String): User
@@ -122,7 +122,7 @@ const resolvers = {
     },
     updatePlace: async (parent, args, context, info) => {
       console.log(args)
-      const place = await Place.findByIdAndUpdate({ _id: args.id }, { $set: { name: args.name, code: args.code, country: args.country, preview: args.preview } }, { new: true });
+      const place = await Place.findByIdAndUpdate({ _id: args.id }, { $set: { name: args.name, code: args.code, country: args.country, preview: args.preview, location: { coordinates: [args.lng, args.lat] } } }, { new: true, useFindAndModify: false });
       return place;
     },
     deletePlace: async (parent, args, context, info) => {
@@ -139,7 +139,8 @@ const resolvers = {
       return user;
     },
     updateUser: async (parent, args, context, info) => {
-      const user = await User.findByIdAndUpdate(args.id, { firstName: args.firstName });
+      console.log(args)
+      const user = await User.findByIdAndUpdate({ _id: args.id }, { $set: { firstName: args.firstName, profilePicture: args.profilePicture } }, { new: true, useFindAndModify: false });
       return user;
     },
     deleteUser: async (parent, args, context, info) => {

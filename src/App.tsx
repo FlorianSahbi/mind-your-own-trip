@@ -150,9 +150,9 @@ function Dialogs() {
   };
 
   const onUpdate = (data: any) => {
-    console.log(data)
+    console.log({ ...data, lat: parseFloat(data.lat), lng: parseFloat(data.lng) })
     //@ts-ignore
-    updatePlace({ variables: { ...data } })
+    updatePlace({ variables: { ...data, lat: parseFloat(data.lat), lng: parseFloat(data.lng) } })
   };
 
   if (createPlaceModal) {

@@ -1,4 +1,4 @@
-import { Typography, CircularProgress } from "@material-ui/core";
+import { Typography, CircularProgress, TextField, Button } from "@material-ui/core";
 import Avatar from "@material-ui/core/Avatar";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { useParams, useHistory } from "react-router-dom";
@@ -6,6 +6,7 @@ import React from "react";
 import CardPlace from "./Card";
 import { places } from "./Constants";
 import { useSnackbar } from 'notistack';
+import { useForm } from "react-hook-form";
 
 const GET_USER = gql`
   query  GetUser($id: ID!) {
@@ -30,8 +31,8 @@ const DELETE_USER = gql`
 `;
 
 const UPDATE_USER = gql`
-  mutation  UpdateUser($id: ID!, $firstName: String) {
-    updateUser(id: $id, firstName: $firstName ) {
+  mutation  UpdateUser($id: ID!, $profilePicture: String, $firstName: String) {
+    updateUser(id: $id, profilePicture: $profilePicture, firstName: $firstName ) {
       _id
       firstName
       lastName
@@ -39,6 +40,49 @@ const UPDATE_USER = gql`
     }
   }
 `;
+
+const PreviewForm = ({ defaultValue }: any) => {
+  // @ts-ignore
+  const { id } = useParams();
+  const { register, handleSubmit } = useForm();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const [UpdateUser] = useMutation(UPDATE_USER, {
+    onCompleted: ({ updateUser: { firstName, lastName, profilePicture } }) => {
+      enqueueSnackbar(`${firstName} has been successfully updated`, { variant: "success" });
+    }
+  })
+
+  const onSubmit = (data: any) => {
+    console.log(data)
+    UpdateUser({ variables: { id, profilePicture: data.profilePicture, firstName: data.firstName } })
+  }
+
+  return (
+    <form id="add-place-form" onSubmit={handleSubmit(onSubmit)}>
+      <TextField
+        inputRef={register}
+        name="profilePicture"
+        label="profilePicture"
+        variant="outlined"
+        defaultValue={defaultValue}
+      />
+      <TextField
+        inputRef={register}
+        name="firstName"
+        label="firstName"
+        variant="outlined"
+        defaultValue={defaultValue}
+      />
+      <Button
+        type="submit"
+        form="add-place-form"
+        color="primary"
+        autoFocus
+      />
+    </form>
+  )
+}
 
 function User() {
   // @ts-ignore
@@ -54,12 +98,6 @@ function User() {
     onCompleted: ({ deleteUser: { firstName } }) => {
       enqueueSnackbar(`${firstName} has been successfully removed`, { variant: "success" });
       history.replace("/users")
-    }
-  })
-
-  const [UpdateUser] = useMutation(UPDATE_USER, {
-    onCompleted: ({ updateUser: { firstName, lastName, profilePicture } }) => {
-      enqueueSnackbar(`${firstName} has been successfully updated`, { variant: "success" });
     }
   })
 
@@ -97,6 +135,7 @@ function User() {
         <Avatar style={{ height: "100px", width: "100px" }} alt="Cindy Baker" src={data.getUser.profilePicture} />
         <Typography variant="h1">
           {data.getUser.firstName}
+          <PreviewForm defaultValue={data.getUser.profilePicture} />
         </Typography>
         {/* <Typography
           onClick={() => deleteUser({ variables: { id } })}

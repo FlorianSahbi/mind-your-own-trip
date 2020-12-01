@@ -9,6 +9,8 @@ import { DialogContext } from "./App";
 interface CardInterface {
   id: string;
   name: string;
+  lat: number;
+  lng: number;
   src: string;
   code: string;
   country: string;
@@ -28,7 +30,7 @@ const useStylesCards = makeStyles({
 });
 
 
-function CardPlace({ id, name, src, code, country, profilePicture, onClick, }: CardInterface) {
+function CardPlace({ id, name, src, code, country, profilePicture, onClick, lat, lng, }: CardInterface) {
   const classes = useStylesCards();
   const { openModal, setPlaceData } = DialogContext.useContainer();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -80,7 +82,7 @@ function CardPlace({ id, name, src, code, country, profilePicture, onClick, }: C
 
   const handleUpdate = (id: string) => {
     handleClose();
-    const placeData = { id, name, preview: src, code, country };
+    const placeData = { id, name, preview: src, code, country, lat, lng };
     setPlaceData(placeData);
   };
 

@@ -84,6 +84,8 @@ export const UPDATE_PLACE = gql`
       $code: String
       $country: String
       $preview: String
+      $lat: Float
+      $lng: Float
     ) {
       updatePlace(
       id: $id
@@ -91,6 +93,8 @@ export const UPDATE_PLACE = gql`
       code: $code
       country: $country
       preview: $preview
+      lat: $lat
+      lng: $lng
       ) {
         _id
         name
