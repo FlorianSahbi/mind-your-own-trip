@@ -138,8 +138,9 @@ function Dialogs() {
     }
   })
   const [updatePlace] = useMutation(UPDATE_PLACE, {
-    onCompleted: ({ updatePlace: { name } }: any) => {
-      enqueueSnackbar(`${name} has been successfully updated`, { variant: "success" });
+    onCompleted: ({ updatePlace }: any) => {
+      console.log(updatePlace)
+      enqueueSnackbar(`${updatePlace.name} has been successfully updated`, { variant: "success" });
       closeModal("editPlaceModal");
     }
   })

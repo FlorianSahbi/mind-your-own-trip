@@ -56,18 +56,18 @@ const Place = mongoose.model('Place', placeSchema);
 const typeDefs = gql`
 
   type Point {
-    _id: ID!
+    _id: ID
     type: String
     coordinates: [Float]
   }
   type User {
-    _id: ID!
+    _id: ID
     firstName: String
     lastName: String
     profilePicture: String
   }
   type Place {
-    _id: ID!
+    _id: ID
     name: String
     country: String
     preview: String
@@ -122,7 +122,7 @@ const resolvers = {
     },
     updatePlace: async (parent, args, context, info) => {
       console.log(args)
-      const place = await Place.update({ _id: args.id }, { $set: { name: args.name, code: args.code, country: args.country, preview: args.country } }, { new: true });
+      const place = await Place.findByIdAndUpdate({ _id: args.id }, { $set: { name: args.name, code: args.code, country: args.country, preview: args.preview } }, { new: true });
       return place;
     },
     deletePlace: async (parent, args, context, info) => {
