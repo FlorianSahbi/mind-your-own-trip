@@ -74,6 +74,7 @@ function Home() {
           }) => (
             <CardPlace
               key={_id}
+              id={_id}
               onClick={() => setPostion([lng, lat])}
               name={name}
               src={preview}

@@ -23,19 +23,31 @@ const userSchema = new Schema({
   firstName: String,
   lastName: String,
   profilePicture: String
-});
+}, { timestamps: true });
 
 const placeSchema = new Schema({
-  name: String,
-  country: String,
-  preview: String,
-  code: String,
+  name: {
+    type: String,
+    required: true
+  },
+  country: {
+    type: String,
+    required: true
+  },
+  preview: {
+    type: String,
+    required: true
+  },
+  code: {
+    type: String,
+    required: true
+  },
   location: {
     type: pointSchema,
     required: true
   },
   addedBy: { type: Schema.Types.ObjectId, ref: "User" }
-});
+}, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
 const Place = mongoose.model('Place', placeSchema);
@@ -72,7 +84,7 @@ const typeDefs = gql`
   }
   type Mutation {
     createPlace(name: String, country: String, preview: String, code: String, addedBy: ID!, lng: Float, lat: Float): Place
-    updatePlace(id: ID!, name: String): Place
+    updatePlace(id: ID!, name: String, code: String, country: String, preview: String): Place
     deletePlace(id: ID!): Place
     createUser(firstName: String, lastName: String, profilePicture: String): User
     updateUser(id: ID!, firstName: String, lastName: String, profilePicture: String): User
@@ -83,8 +95,7 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     getPlaces: async () => {
-      const p = await Place.find({});
-      return await Place.find({}).populate("addedBy");
+      return await Place.find({}).populate("addedBy").sort({ createdAt: -1 });
     },
     getPlace: async (parent, args, context, info) => {
       const user = await Place.findById(args.id);
@@ -110,7 +121,8 @@ const resolvers = {
       return place;
     },
     updatePlace: async (parent, args, context, info) => {
-      const place = await Place.findByIdAndUpdate(args.id, { name: args.name });
+      console.log(args)
+      const place = await Place.update({ _id: args.id }, { $set: { name: args.name, code: args.code, country: args.country, preview: args.country } }, { new: true });
       return place;
     },
     deletePlace: async (parent, args, context, info) => {

@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { createContainer } from "unstated-next";
 import { SnackbarProvider, useSnackbar } from "notistack";
 import { useMutation, gql, useQuery } from "@apollo/client";
-import { CREATE_PLACE } from "./GraphQl/places";
+import { CREATE_PLACE, UPDATE_PLACE } from "./GraphQl/places";
 import {
   Dialog,
   DialogActions,
@@ -30,10 +30,14 @@ interface FormInterface {
 
 interface DialogContextInterface {
   createPlaceModal: boolean;
+  editPlaceModal: boolean;
+  placeData: any;
 }
 
 const initialState: DialogContextInterface = {
   createPlaceModal: false,
+  editPlaceModal: false,
+  placeData: null,
 }
 
 interface UserInterface {
@@ -54,9 +58,10 @@ function useAuth() {
 
 function useDialog(initialState: DialogContextInterface) {
   const [state, setState] = useState<DialogContextInterface>(initialState);
-  const openModal = (name: "createPlaceModal") => setState({ ...state, [name]: true });
-  const closeModal = (name: "createPlaceModal") => setState({ ...state, [name]: false });
-  return { ...state, openModal, closeModal };
+  const openModal = (name: "createPlaceModal" | "editPlaceModal") => setState({ ...state, [name]: true });
+  const closeModal = (name: "createPlaceModal" | "editPlaceModal") => setState({ ...state, [name]: false });
+  const setPlaceData = (placeData: any) => setState({ ...state, placeData, editPlaceModal: true });
+  return { ...state, openModal, closeModal, setPlaceData };
 }
 
 //@ts-ignore
@@ -94,7 +99,7 @@ export const theme = createMuiTheme({
 });
 
 function Dialogs() {
-  const { createPlaceModal, closeModal } = DialogContext.useContainer();
+  const { createPlaceModal, editPlaceModal, placeData, closeModal } = DialogContext.useContainer();
   const { activeUser } = AuthContext.useContainer();
   const { register, handleSubmit } = useForm();
   const { enqueueSnackbar } = useSnackbar();
@@ -122,8 +127,6 @@ function Dialogs() {
                 }
               `
             });
-            console.log(newPlaceRef)
-            console.log(existingPlaces)
             return [newPlaceRef, ...existingPlaces];
           }
         }
@@ -134,101 +137,220 @@ function Dialogs() {
       closeModal("createPlaceModal");
     }
   })
+  const [updatePlace] = useMutation(UPDATE_PLACE, {
+    onCompleted: ({ updatePlace: { name } }: any) => {
+      enqueueSnackbar(`${name} has been successfully updated`, { variant: "success" });
+      closeModal("editPlaceModal");
+    }
+  })
   const onSubmit = (data: any) => {
     //@ts-ignore
     createPlace({ variables: { ...data, lng: parseFloat(data.lng), lat: parseFloat(data.lat), addedBy: activeUser?._id } })
   };
 
-  return (
-    <Dialog
-      open={createPlaceModal}
-      onClose={() => closeModal("createPlaceModal")}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-    >
-      <DialogTitle id="alert-dialog-title">
-        Add a place.
+  const onUpdate = (data: any) => {
+    console.log(data)
+    //@ts-ignore
+    updatePlace({ variables: { ...data } })
+  };
+
+  if (createPlaceModal) {
+    return (
+      <Dialog
+        open={createPlaceModal}
+        onClose={() => closeModal("createPlaceModal")}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          Add a place.
       </DialogTitle>
-      <DialogContent>
-        <DialogContentText id="alert-dialog-description">
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
 
-          <form id="add-place-form" onSubmit={handleSubmit(onSubmit)} style={{ display: "flex", flexDirection: "column" }}>
-            <TextField
-              margin="dense"
-              name="name"
-              label="Name"
-              id="outlined-basic"
-              variant="outlined"
-              inputRef={register({ required: true })}
-            />
-            <span style={{ margin: "10px 0" }} />
-            <TextField
-              margin="dense"
-              name="country"
-              label="Country"
-              id="outlined-basic"
-              variant="outlined"
-              inputRef={register({ required: true })}
-            />
-            <span style={{ margin: "10px 0" }} />
-            <TextField
-              margin="dense"
-              name="preview"
-              label="Preview"
-              id="outlined-basic"
-              variant="outlined"
-              inputRef={register({ required: true })}
-            />
-            <span style={{ margin: "10px 0" }} />
-            <TextField
-              margin="dense"
-              name="code"
-              label="Code"
-              id="outlined-basic"
-              variant="outlined"
-              inputRef={register({ required: true })}
-            />
-            <span style={{ margin: "10px 0" }} />
-            <TextField
-              margin="dense"
-              name="lat"
-              defaultValue="48.8534"
-              label="Latitude"
-              id="outlined-basic"
-              variant="outlined"
-              inputRef={register({ required: true })}
-            />
-            <span style={{ margin: "10px 0" }} />
-            <TextField
-              margin="dense"
-              name="lng"
-              defaultValue="2.3488"
-              label="Longitude"
-              id="outlined-basic"
-              variant="outlined"
-              inputRef={register({ required: true })}
-            />
-          </form>
+            <form id="add-place-form" onSubmit={handleSubmit(onSubmit)} style={{ display: "flex", flexDirection: "column" }}>
+              <TextField
+                margin="dense"
+                name="name"
+                label="Name"
+                id="outlined-basic"
+                variant="outlined"
+                inputRef={register({ required: true })}
+              />
+              <span style={{ margin: "10px 0" }} />
+              <TextField
+                margin="dense"
+                name="country"
+                label="Country"
+                id="outlined-basic"
+                variant="outlined"
+                inputRef={register({ required: true })}
+              />
+              <span style={{ margin: "10px 0" }} />
+              <TextField
+                margin="dense"
+                name="preview"
+                label="Preview"
+                id="outlined-basic"
+                variant="outlined"
+                inputRef={register({ required: true })}
+              />
+              <span style={{ margin: "10px 0" }} />
+              <TextField
+                margin="dense"
+                name="code"
+                label="Code"
+                id="outlined-basic"
+                variant="outlined"
+                inputRef={register({ required: true })}
+              />
+              <span style={{ margin: "10px 0" }} />
+              <TextField
+                margin="dense"
+                name="lat"
+                defaultValue="48.8534"
+                label="Latitude"
+                id="outlined-basic"
+                variant="outlined"
+                inputRef={register({ required: true })}
+              />
+              <span style={{ margin: "10px 0" }} />
+              <TextField
+                margin="dense"
+                name="lng"
+                defaultValue="2.3488"
+                label="Longitude"
+                id="outlined-basic"
+                variant="outlined"
+                inputRef={register({ required: true })}
+              />
+            </form>
 
-
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => closeModal("createPlaceModal")} color="primary">
-          Disagree
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => closeModal("createPlaceModal")} color="primary">
+            Disagree
       </Button>
-        <Button
-          type="submit"
-          form="add-place-form"
-          // onClick={() => closeModal("createPlaceModal")}
-          color="primary"
-          autoFocus
-        >
-          Agree
+          <Button
+            type="submit"
+            form="add-place-form"
+            // onClick={() => closeModal("createPlaceModal")}
+            color="primary"
+            autoFocus
+          >
+            Agree
       </Button>
-      </DialogActions>
-    </Dialog>
-  )
+        </DialogActions>
+      </Dialog>
+    )
+  }
+
+  if (editPlaceModal) {
+    return (
+      <Dialog
+        open={editPlaceModal}
+        onClose={() => closeModal("editPlaceModal")}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          Update a place.
+      </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+
+            <form id="add-place-form" onSubmit={handleSubmit(onUpdate)} style={{ display: "flex", flexDirection: "column" }}>
+              <TextField
+                margin="dense"
+                name="name"
+                label="Name"
+                defaultValue={placeData?.name}
+                id="outlined-basic"
+                variant="outlined"
+                inputRef={register({ required: true })}
+              />
+              <span style={{ margin: "10px 0" }} />
+              <TextField
+                margin="dense"
+                name="country"
+                defaultValue={placeData?.country}
+                label="Country"
+                id="outlined-basic"
+                variant="outlined"
+                inputRef={register({ required: true })}
+              />
+              <span style={{ margin: "10px 0" }} />
+              <TextField
+                margin="dense"
+                name="preview"
+                defaultValue={placeData?.preview}
+                label="Preview"
+                id="outlined-basic"
+                variant="outlined"
+                inputRef={register({ required: true })}
+              />
+              <span style={{ margin: "10px 0" }} />
+              <TextField
+                margin="dense"
+                name="code"
+                defaultValue={placeData?.code}
+                label="Code"
+                id="outlined-basic"
+                variant="outlined"
+                inputRef={register({ required: true })}
+              />
+              <span style={{ margin: "10px 0" }} />
+              <TextField
+                margin="dense"
+                name="lat"
+                defaultValue={placeData?.lat}
+                label="Latitude"
+                id="outlined-basic"
+                variant="outlined"
+                inputRef={register({ required: false })}
+              />
+              <span style={{ margin: "10px 0" }} />
+              <TextField
+                margin="dense"
+                name="lng"
+                defaultValue={placeData?.lng}
+                label="Longitude"
+                id="outlined-basic"
+                variant="outlined"
+                inputRef={register({ required: false })}
+              />
+              <span style={{ margin: "10px 0" }} />
+              <TextField
+                inputProps={{ type: "hidden" }}
+                name="id"
+                defaultValue={placeData?.id}
+                inputRef={register({ required: false })}
+              />
+
+            </form>
+
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => closeModal("editPlaceModal")} color="primary">
+            Disagree
+      </Button>
+          <Button
+            type="submit"
+            form="add-place-form"
+            // onClick={() => closeModal("createPlaceModal")}
+            color="primary"
+            autoFocus
+          >
+            Agree
+      </Button>
+        </DialogActions>
+      </Dialog>
+    )
+  }
+
+  return <></>
 }
 
 export default function App() {

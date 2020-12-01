@@ -276,6 +276,7 @@ interface PositionInterface {
 }
 
 export interface PlaceInterface {
+  id: string;
   user: UserInterface;
   name: string;
   country: string;
@@ -305,6 +306,7 @@ export const users: UserInterface[] = [
 
 export let places: PlaceInterface[] = [
   {
+    id: "kokok",
     user: users[0],
     code: "IT",
     position: {

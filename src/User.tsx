@@ -113,7 +113,7 @@ function User() {
           Edit
         </Typography> */}
       </div>
-      <div
+      {/* <div
         className="App"
         style={{
           display: "grid",
@@ -124,9 +124,10 @@ function User() {
         }}
       >
         {places?.filter(({ user: { firstName } }) => firstName === data.getUser.firstName).map(
-          ({ name, preview, code, country, user: { profilePicture } }) => (
+          ({ _id, name, preview, code, country, user: { profilePicture } }) => (
             <CardPlace
-              key={`${name}${preview}`}
+              key={_id}
+              id={_id}
               name={name}
               src={preview}
               country={country}
@@ -135,7 +136,7 @@ function User() {
             />
           )
         )}
-      </div>
+      </div> */}
     </>
   )
 }
