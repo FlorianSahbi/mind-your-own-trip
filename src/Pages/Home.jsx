@@ -33,16 +33,16 @@ function Home() {
       <div style={{ height: "70vh", width: "100%" }}>
         <MapContainer center={position} zoom={5} scrollWheelZoom={true}>
           <LayersControl position="topright">
-            <LayersControl.BaseLayer name="OpenStreetMap.Mapnik">
-              <TileLayer
-                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-            </LayersControl.BaseLayer>
             <LayersControl.BaseLayer checked name="Watercolor">
               <TileLayer
-                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
                 url="http://a.tile.stamen.com/watercolor/{z}/{x}/{y}.png"
+              />
+            </LayersControl.BaseLayer>
+            <LayersControl.BaseLayer name="OpenStreetMap">
+              <TileLayer
+                attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
             </LayersControl.BaseLayer>
             {data.getPlaces?.map(
