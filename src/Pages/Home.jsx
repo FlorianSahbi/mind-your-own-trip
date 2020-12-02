@@ -36,7 +36,7 @@ function Home() {
             <LayersControl.BaseLayer checked name="Watercolor">
               <TileLayer
                 attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
-                url="http://a.tile.stamen.com/watercolor/{z}/{x}/{y}.png"
+                url="https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png"
               />
             </LayersControl.BaseLayer>
             <LayersControl.BaseLayer name="OpenStreetMap">
