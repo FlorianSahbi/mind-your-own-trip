@@ -1,5 +1,24 @@
 import { gql } from "@apollo/client";
 
+export const GET_PLACE = gql`
+  query  GetPlace($id: ID!) {
+    getPlace(id: $id) {
+      _id
+      name
+      country
+      preview
+      code
+      addedBy {
+        firstName
+        profilePicture
+      }
+      location {
+        coordinates
+      }
+    }
+  }
+`;
+
 export const GET_PLACES = gql`
   query GetPlaces {
     getPlaces {

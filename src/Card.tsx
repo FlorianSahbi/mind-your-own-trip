@@ -1,10 +1,11 @@
 import { IconButton, CardActionArea, Card, CardHeader, Avatar, Typography, CardMedia, CardActions, Button, makeStyles, Menu, MenuItem, } from "@material-ui/core";
-import React, { useState, MouseEvent } from "react";
+import React, { useState } from "react";
 import countryToFlag from "./countryToFlag";
 import MoreVertRoundedIcon from '@material-ui/icons/MoreVertRounded';
 import { useMutation, gql } from "@apollo/client";
 import { DELETE_PLACE } from "./GraphQl/places";
-import { DialogContext } from "./App";
+import { Dialog } from "@material-ui/core";
+import UpdatePlaceForm from "./Components/UpdatePlaceForm";
 
 interface CardInterface {
   id: string;
@@ -32,7 +33,7 @@ const useStylesCards = makeStyles({
 
 function CardPlace({ id, name, src, code, country, profilePicture, onClick, lat, lng, }: CardInterface) {
   const classes = useStylesCards();
-  const { openModal, setPlaceData } = DialogContext.useContainer();
+  const [editModal, setEditModal] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [deletePlace] = useMutation(DELETE_PLACE, {
     update: (cache, { data: { deletePlace } }) => {
@@ -81,56 +82,66 @@ function CardPlace({ id, name, src, code, country, profilePicture, onClick, lat,
   };
 
   const handleUpdate = (id: string) => {
+    setEditModal(true);
     handleClose();
-    const placeData = { id, name, preview: src, code, country, lat, lng };
-    setPlaceData(placeData);
   };
 
   return (
-    <Card onClick={onClick} className={classes.root}>
-      <CardHeader
-        avatar={profilePicture ? <Avatar src={profilePicture} aria-label="recipe" /> : <Avatar src={profilePicture} aria-label="recipe"> U  </Avatar>}
-        title={<Typography variant="h2">{name}</Typography>}
-        disableTypography
-        action={
-          <>
-            <IconButton
-              aria-controls="simple-menu"
-              aria-haspopup="true"
-              onClick={handleClick}
-            >
-              <MoreVertRoundedIcon />
-            </IconButton>
-            <Menu
-              id="simple-menu"
-              anchorEl={anchorEl}
-              keepMounted
-              open={Boolean(anchorEl)}
-              onClose={handleClose}
-            >
-              <MenuItem onClick={() => handleUpdate(id)}>Update</MenuItem>
-              <MenuItem onClick={() => handleDelete(id)}>Delete</MenuItem>
-            </Menu>
-          </>
-        }
-      />
-      <CardActionArea>
-        <CardMedia
-          component="img"
-          alt={src}
-          height="200"
-          image={src}
-          title={src}
+    <>
+      <Card onClick={onClick} className={classes.root}>
+        <CardHeader
+          avatar={profilePicture ? <Avatar src={profilePicture} aria-label="recipe" /> : <Avatar src={profilePicture} aria-label="recipe"> U  </Avatar>}
+          title={<Typography variant="h2">{name}</Typography>}
+          disableTypography
+          action={
+            <>
+              <IconButton
+                aria-controls="simple-menu"
+                aria-haspopup="true"
+                onClick={handleClick}
+              >
+                <MoreVertRoundedIcon />
+              </IconButton>
+              <Menu
+                id="simple-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+              >
+                <MenuItem onClick={() => handleUpdate(id)}>Update</MenuItem>
+                <MenuItem onClick={() => handleDelete(id)}>Delete</MenuItem>
+              </Menu>
+            </>
+          }
         />
-      </CardActionArea>
-      <CardActions classes={{ root: classes.CardActions }}>
-        <Button size="small" color="primary">
-          <Typography style={{ textTransform: "capitalize" }} variant="h6">
-            {`${countryToFlag(code)} ${country}`}
-          </Typography>
-        </Button>
-      </CardActions>
-    </Card >
+        <CardActionArea>
+          <CardMedia
+            component="img"
+            alt={src}
+            height="200"
+            image={src}
+            title={src}
+          />
+        </CardActionArea>
+        <CardActions classes={{ root: classes.CardActions }}>
+          <Button size="small" color="primary">
+            <Typography style={{ textTransform: "capitalize" }} variant="h6">
+              {`${countryToFlag(code)} ${country}`}
+            </Typography>
+          </Button>
+        </CardActions>
+      </Card >
+      <Dialog
+        open={editModal}
+        onClose={() => setEditModal(false)}
+      >
+        <UpdatePlaceForm
+          id={id}
+          handleSave={() => setEditModal(false)}
+        />
+      </Dialog>
+    </>
   );
 }
 

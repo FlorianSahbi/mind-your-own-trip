@@ -130,7 +130,7 @@ const resolvers = {
       return place;
     },
     createUser: async (parent, args, context, info) => {
-      const user = await new User({ firstName: args.firstName, lastName: args.lastname, profilePicture: args.profilePicture });
+      const user = await new User({ firstName: args.firstName, lastName: args.lastName, profilePicture: args.profilePicture });
       user.save((err) => {
         if (err) {
           return console.error(err);
@@ -140,7 +140,7 @@ const resolvers = {
     },
     updateUser: async (parent, args, context, info) => {
       console.log(args)
-      const user = await User.findByIdAndUpdate({ _id: args.id }, { $set: { firstName: args.firstName, profilePicture: args.profilePicture } }, { new: true, useFindAndModify: false });
+      const user = await User.findByIdAndUpdate({ _id: args.id }, { $set: { firstName: args.firstName, lastName: args.lastName, profilePicture: args.profilePicture } }, { new: true, useFindAndModify: false });
       return user;
     },
     deleteUser: async (parent, args, context, info) => {
